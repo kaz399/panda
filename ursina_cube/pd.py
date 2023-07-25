@@ -27,24 +27,25 @@ class MyApp(ShowBase):
         self.disableMouse()
 
         # カメラの位置と方向を設定
-        self.camera.setPos(10, -10, 10)
+        self.camera.setPos(50, -10, -10)
         self.camera.lookAt(Point3(0, 0, 0))
-        #self.camera.setR(180)
+        self.camera.setR(180)
 
         # ライト
         light = DirectionalLight("light")
         light.setColor(LColor(1, 1, 1, 1))  # 白色の光
         light.setShadowCaster(True)  # 影を生成するように設定
-        light.setDirection((-100, 0, 20))  # 光の方向を設定
+        light.setDirection((-100, 100, 20))  # 光の方向を設定
         light_np = self.render.attachNewNode(light)
         self.render.setLight(light_np)
 
         # モデルを読み込む
-        obj_path = "../assets/cube.fbx"
+        obj_path = "../assets/cube_noconv.fbx"
         self.obj_model = self.loader.loadModel(obj_path)
         self.obj_model.reparentTo(self.render)
+        print(self.obj_model.getQuat())
 
-        coordinate_path = "../assets/coordinate.fbx"
+        coordinate_path = "../assets/coordinate2.fbx"
         self.obj_coordinate = self.loader.loadModel(coordinate_path)
         self.obj_coordinate.reparentTo(self.render)
 
@@ -54,7 +55,7 @@ class MyApp(ShowBase):
         #self.obj_model.setHpr(0, 0, 0)
         self.obj_model.setScale(1)
 
-        self.obj_coordinate.setScale(0.01)
+        self.obj_coordinate.setScale(5)
 
 
 my_app = MyApp()

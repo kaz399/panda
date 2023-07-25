@@ -161,12 +161,12 @@ def sensor_handler(payload: bytearray) -> None:
         # (z, x, y) = rot.as_euler(order, degrees=True)
         # logger.info(f"Emulated Euler {order}: x:{x:.4f}, y:{y:.4f}, z:{z:.4f}")
 
-        # order = "xyz"
-        # (x, y, z) = rot.as_euler(order, degrees=True)
-        # logger.info(f"Emulated Euler {order}: x:{x:.4f}, y:{y:.4f}, z:{z:.4f}")
-        order = "xzy"
-        (x, z, y) = rot.as_euler(order, degrees=True)
+        order = "xyz"
+        (x, y, z) = rot.as_euler(order, degrees=True)
         logger.info(f"Emulated Euler {order}: x:{x:.4f}, y:{y:.4f}, z:{z:.4f}")
+        # order = "xzy"
+        # (x, z, y) = rot.as_euler(order, degrees=True)
+        # logger.info(f"Emulated Euler {order}: x:{x:.4f}, y:{y:.4f}, z:{z:.4f}")
         # order = "yxz"
         # (y, x, z) = rot.as_euler(order, degrees=True)
         # logger.info(f"Emulated Euler {order}: x:{x:.4f}, y:{y:.4f}, z:{z:.4f}")
@@ -185,11 +185,10 @@ class MyApp(ShowBase):
     def __init__(self):
         ShowBase.__init__(self)
 
-        self.rot = 0
         self.disableMouse()
 
         # カメラの位置と方向を設定
-        self.camera.setPos(2, 0, 0)
+        self.camera.setPos(50, -10, -10)
         self.camera.lookAt(Point3(0, 0, 0))
         self.camera.setR(180)
 
@@ -197,20 +196,27 @@ class MyApp(ShowBase):
         light = DirectionalLight("light")
         light.setColor(LColor(1, 1, 1, 1))  # 白色の光
         light.setShadowCaster(True)  # 影を生成するように設定
-        light.setDirection((-100, 0, 20))  # 光の方向を設定
+        light.setDirection((-100, 100, 20))  # 光の方向を設定
         light_np = self.render.attachNewNode(light)
         self.render.setLight(light_np)
 
         # モデルを読み込む
-        obj_path = "../assets/cube.gltf"
+        obj_path = "../assets/cube_noconv.fbx"
         self.obj_model = self.loader.loadModel(obj_path)
         self.obj_model.reparentTo(self.render)
+        print(self.obj_model.getQuat())
+
+        coordinate_path = "../assets/coordinate2.fbx"
+        self.obj_coordinate = self.loader.loadModel(coordinate_path)
+        self.obj_coordinate.reparentTo(self.render)
 
         # モデルの位置とスケールを調整
         self.obj_model.setPos(0, 0, 0)
-        self.obj_model.setHpr(0, 0, 0)
-        self.obj_model.setScale(1)
-        print(self.obj_model.getQuat())
+        #self.obj_model.setH(self.obj_model, -90)
+        #self.obj_model.setHpr(0, 0, 0)
+        self.obj_model.setScale(2.5)
+
+        self.obj_coordinate.setScale(5)
 
         self.taskMgr.add(self.update, "cube update")
 
