@@ -121,12 +121,13 @@ def sensor_handler(payload: bytearray) -> None:
         CUBE_STATE.euler.x = math.radians(sensor_info.roll)
         CUBE_STATE.euler.y = math.radians(sensor_info.pitch)
         CUBE_STATE.euler.z = math.radians(sensor_info.yaw)
-        rot = Rotation.from_euler("xyz", CUBE_STATE.euler.np_array_xyz(), degrees=True)
+        order = "xyz"
+        rot = Rotation.from_euler(order, CUBE_STATE.euler.np_array_xyz(), degrees=True)
         logger.info(f"Euler: x:{sensor_info.roll}, y:{sensor_info.pitch}, z:{sensor_info.yaw}")
         quat = rot.as_quat(canonical=True)
         logger.info(f"Emulated Quaternion: x:{quat[0]:4F}, y:{quat[1]:4F}, z:{quat[2]:4F}, w:{quat[3]:4F}")
-        deg = rot.as_euler("ZYX", degrees=True)
-        logger.info(f"Emulated Euler zyx: x:{deg[2]:4F}, y:{deg[1]:4F}, z:{deg[0]:4F}")
+        (x, y, z) = rot.as_euler(order, degrees=True)
+        logger.info(f"Emulated Euler {order}: x:{x:.4f}, y:{y:.4f}, z:{z:.4f}")
     elif isinstance(sensor_info, PostureAngleQuaternionsData):
         CUBE_STATE.quaternion_update = True
         CUBE_STATE.quaternion.W = sensor_info.w / 10000.0
