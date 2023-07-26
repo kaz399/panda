@@ -118,9 +118,9 @@ def sensor_handler(payload: bytearray) -> None:
     sensor_info = Sensor.is_my_data(payload)
     if isinstance(sensor_info, PostureAngleEulerData):
         CUBE_STATE.euler_update = True
-        CUBE_STATE.euler.x = math.radians(sensor_info.roll)
-        CUBE_STATE.euler.y = math.radians(sensor_info.pitch)
-        CUBE_STATE.euler.z = math.radians(sensor_info.yaw)
+        CUBE_STATE.euler.x = sensor_info.roll
+        CUBE_STATE.euler.y = sensor_info.pitch
+        CUBE_STATE.euler.z = sensor_info.yaw
         order = "xyz"
         rot = Rotation.from_euler(order, CUBE_STATE.euler.np_array_xyz(), degrees=True)
         logger.info(f"Euler: x:{sensor_info.roll}, y:{sensor_info.pitch}, z:{sensor_info.yaw}")
@@ -225,6 +225,11 @@ class MyApp(ShowBase):
         if CUBE_STATE.quaternion_update:
             self.obj_model.setQuat(CUBE_STATE.quaternion.quat)
             CUBE_STATE.quaternion_update = False
+        elif CUBE_STATE.euler_update:
+            self.obj_model.setH(CUBE_STATE.euler.z)
+            self.obj_model.setR(CUBE_STATE.euler.y) # Roll = axis Y (in panda3d)
+            self.obj_model.setP(CUBE_STATE.euler.x) # Pitch = axis X (in panda3d)
+            CUBE_STATE.euler_update = False
         return task.cont
 
 
