@@ -202,7 +202,8 @@ class MyApp(ShowBase):
         self.render.setLight(light_np)
 
         # モデルを読み込む
-        obj_path = "../assets/cube_noconv.fbx"
+        # obj_path = "../assets/cube_noconv.fbx"
+        obj_path = "../assets/SPHERE.fbx"
         self.obj_model = self.loader.loadModel(obj_path)
         self.obj_model.reparentTo(self.render)
         print(self.obj_model.getQuat())
@@ -215,7 +216,8 @@ class MyApp(ShowBase):
         self.obj_model.setPos(0, 0, 0)
         #self.obj_model.setH(self.obj_model, -90)
         #self.obj_model.setHpr(0, 0, 0)
-        self.obj_model.setScale(2.5)
+        #self.obj_model.setScale(2.5)
+        self.obj_model.setScale(0.05)
 
         self.obj_coordinate.setScale(5)
 
