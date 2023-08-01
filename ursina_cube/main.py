@@ -4,8 +4,6 @@
 #
 #     main.py
 #
-#     Copyright 2023 Sony Interactive Entertainment Inc.
-#
 # ************************************************************
 
 import asyncio

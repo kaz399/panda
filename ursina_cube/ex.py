@@ -4,8 +4,6 @@
 #
 #     ex.py
 #
-#     Copyright 2023 Sony Interactive Entertainment Inc.
-#
 # ************************************************************
 
 from ursina import *

@@ -4,8 +4,6 @@
 #
 #     pd.py
 #
-#     Copyright 2023 Sony Interactive Entertainment Inc.
-#
 # ************************************************************
 
 from direct.showbase.ShowBase import ShowBase
