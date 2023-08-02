@@ -12,6 +12,7 @@ import fileinput
 import numpy as np
 import math
 import pprint
+import os
 import sys
 from dataclasses import dataclass, field
 from enum import Enum, auto
@@ -181,7 +182,7 @@ def sensor_handler(payload: bytearray) -> None:
 
 
 class MyApp(ShowBase):
-    def __init__(self):
+    def __init__(self, opt: argparse.Namespace):
         ShowBase.__init__(self)
 
         self.disableMouse()
@@ -201,7 +202,7 @@ class MyApp(ShowBase):
 
         # モデルを読み込む
         # obj_path = "../assets/cube_noconv.fbx"
-        obj_path = "../assets/SPHERE.fbx"
+        obj_path = Filename.fromOsSpecific(os.path.abspath(opt.model))
         self.obj_model = self.loader.loadModel(obj_path)
         self.obj_model.reparentTo(self.render)
         print(self.obj_model.getQuat())
@@ -214,8 +215,9 @@ class MyApp(ShowBase):
         self.obj_model.setPos(0, 0, 0)
         #self.obj_model.setH(self.obj_model, -90)
         #self.obj_model.setHpr(0, 0, 0)
+
         #self.obj_model.setScale(2.5)
-        self.obj_model.setScale(0.05)
+        self.obj_model.setScale(opt.scale)
 
         self.obj_coordinate.setScale(5)
 
@@ -239,6 +241,8 @@ def options(argv):
     op.add_argument("--dry-run", action="store_true", help="do not perform actions")
     op.add_argument("-v", "--verbose", action="store_true", help="verbose mode")
     op.add_argument("-q", "--quiet", action="store_true", help="quiet mode")
+    op.add_argument("-m", "--model", action="store", help="3D model", type=str, default="../assets/cube_noconv.fbx")
+    op.add_argument("-s", "--scale", action="store", help="scale", type=float, default=1.0)
     op.add_argument("argv", nargs="*", help="args")
     opt = op.parse_args(argv[1:])
     # set logging level
@@ -270,7 +274,7 @@ async def main(argv):
                 color=Color(r=0, g=128, b=32),
             )
         )
-        my_app = MyApp()
+        my_app = MyApp(opt)
         try:
             while True:
                 await asyncio.sleep(0)
