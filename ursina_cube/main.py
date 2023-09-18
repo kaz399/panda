@@ -228,9 +228,11 @@ class MyApp(ShowBase):
             self.obj_model.setQuat(CUBE_STATE.quaternion.quat)
             CUBE_STATE.quaternion_update = False
         elif CUBE_STATE.euler_update:
-            self.obj_model.setH(CUBE_STATE.euler.z)
-            self.obj_model.setR(CUBE_STATE.euler.y) # Roll = axis Y (in panda3d)
-            self.obj_model.setP(CUBE_STATE.euler.x) # Pitch = axis X (in panda3d)
+            # XYZ rotation (Z -> Y -> X)
+            self.obj_model.setHpr(0, 0, 0)
+            self.obj_model.setH(self.obj_model, CUBE_STATE.euler.z)
+            self.obj_model.setR(self.obj_model, CUBE_STATE.euler.y) # Roll = axis Y (in panda3d)
+            self.obj_model.setP(self.obj_model, CUBE_STATE.euler.x) # Pitch = axis X (in panda3d)
             CUBE_STATE.euler_update = False
         return task.cont
 
