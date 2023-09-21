@@ -154,16 +154,16 @@ def sensor_handler(payload: bytearray) -> None:
         # order = "YZX"
         # (y, z, x) = rot.as_euler(order, degrees=True)
         # logger.info(f"Emulated Euler {order}: x:{x:.4f}, y:{y:.4f}, z:{z:.4f}")
-        # order = "ZYX"
-        # (z, y, x) = rot.as_euler(order, degrees=True)
-        # logger.info(f"Emulated Euler {order}: x:{x:.4f}, y:{y:.4f}, z:{z:.4f}")
         # order = "ZXY"
         # (z, x, y) = rot.as_euler(order, degrees=True)
         # logger.info(f"Emulated Euler {order}: x:{x:.4f}, y:{y:.4f}, z:{z:.4f}")
-
-        order = "xyz"
-        (x, y, z) = rot.as_euler(order, degrees=True)
+        order = "ZYX"
+        (z, y, x) = rot.as_euler(order, degrees=True)
         logger.info(f"Emulated Euler {order}: x:{x:.4f}, y:{y:.4f}, z:{z:.4f}")
+
+        # order = "xyz"
+        # (x, y, z) = rot.as_euler(order, degrees=True)
+        # logger.info(f"Emulated Euler {order}: x:{x:.4f}, y:{y:.4f}, z:{z:.4f}")
         # order = "xzy"
         # (x, z, y) = rot.as_euler(order, degrees=True)
         # logger.info(f"Emulated Euler {order}: x:{x:.4f}, y:{y:.4f}, z:{z:.4f}")
@@ -173,12 +173,16 @@ def sensor_handler(payload: bytearray) -> None:
         # order = "yzx"
         # (y, z, x) = rot.as_euler(order, degrees=True)
         # logger.info(f"Emulated Euler {order}: x:{x:.4f}, y:{y:.4f}, z:{z:.4f}")
-        # order = "zyx"
-        # (z, y, x) = rot.as_euler(order, degrees=True)
-        # logger.info(f"Emulated Euler {order}: x:{x:.4f}, y:{y:.4f}, z:{z:.4f}")
         # order = "zxy"
         # (z, x, y) = rot.as_euler(order, degrees=True)
         # logger.info(f"Emulated Euler {order}: x:{x:.4f}, y:{y:.4f}, z:{z:.4f}")
+        # order = "zyx"
+        # (z, y, x) = rot.as_euler(order, degrees=True)
+        # logger.info(f"Emulated Euler {order}: x:{x:.4f}, y:{y:.4f}, z:{z:.4f}")
+
+        CUBE_STATE.euler.x = x
+        CUBE_STATE.euler.y = y
+        CUBE_STATE.euler.z = z
 
 
 class MyApp(ShowBase):
@@ -226,6 +230,10 @@ class MyApp(ShowBase):
     def update(self, task):
         if CUBE_STATE.quaternion_update:
             self.obj_model.setQuat(CUBE_STATE.quaternion.quat)
+            # self.obj_model.setHpr(0, 0, 0)
+            # self.obj_model.setH(self.obj_model, CUBE_STATE.euler.z)
+            # self.obj_model.setR(self.obj_model, CUBE_STATE.euler.y) # Roll = axis Y (in panda3d)
+            # self.obj_model.setP(self.obj_model, CUBE_STATE.euler.x) # Pitch = axis X (in panda3d)
             CUBE_STATE.quaternion_update = False
         elif CUBE_STATE.euler_update:
             # XYZ rotation (Z -> Y -> X)
@@ -261,7 +269,9 @@ def options(argv):
 
 async def main(argv):
     opt = options(argv)
-    angle_type = PostureAngleDetectionType.Quaternions
+    color_euler = Color(r=0, g=128, b=32)
+    color_quaternion = Color(r=80, g=128, b=0)
+    angle_type = PostureAngleDetectionType.Euler
 
     async with await SimpleCube.search() as cube:
         print("** CONNECTED")
@@ -282,15 +292,21 @@ async def main(argv):
                 await asyncio.sleep(0)
 
                 if CUBE_STATE.button_pressed == CubeButtonState.Pressed:
-                    CUBE_STATE.button_pressed = CubeButtonState.Ack
+                    # change detection type
+                    if angle_type == PostureAngleDetectionType.Quaternions:
+                        angle_type = PostureAngleDetectionType.Euler
+                        led_color = color_euler
+                    else:
+                        angle_type = PostureAngleDetectionType.Quaternions
+                        led_color = color_quaternion
 
                     await cube.api.configuration.set_posture_angle_detection(
                         angle_type, 100, PostureAngleDetectionCondition.ChangeDetection
                     )
-                    if angle_type == PostureAngleDetectionType.Quaternions:
-                        angle_type = PostureAngleDetectionType.Euler
-                    else:
-                        angle_type = PostureAngleDetectionType.Quaternions
+                    await cube.api.indicator.turn_on(
+                        IndicatorParam(duration_ms=0, color=led_color)
+                    )
+                    CUBE_STATE.button_pressed = CubeButtonState.Ack
                 taskMgr.step()
         finally:
             await cube.api.sensor.unregister_notification_handler(sensor_handler)
