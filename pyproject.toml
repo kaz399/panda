@@ -1,10 +1,10 @@
 [tool.poetry]
-name = "ursina-cube"
+name = "cube_posture"
 version = "0.1.0"
 description = ""
 authors = ["TE-KazuhiroYabe <Kazuhiro.Yabe@sony.com>"]
 readme = "README.md"
-packages = [{include = "ursina_cube"}]
+packages = [{include = "cube_posture"}]
 
 [tool.poetry.dependencies]
 python = ">=3.11,<3.13"
